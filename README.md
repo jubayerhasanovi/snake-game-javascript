@@ -5,8 +5,11 @@ Open the HTML file in your browser and press start.
 --------------------------------------------------------
 
 prees right arrow to go right.
+
 prees left arrow to go left.
+
 prees up arrow to go up.
+
 prees down arrow to go down.
 
 --------------------------------------------------------
