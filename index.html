@@ -3,16 +3,26 @@
   <head>
   	<title>Snake Game</title>
   	<link rel="stylesheet" type="text/css" href="styles/styles.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
   </head>
   <body>
   
+
+    <audio id="score-sound">
+      <source src="score.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- <audio id="background-sound" loop>
+      <source src="background.mp3" type="audio/mp3">
+    </audio> -->
+
   <div class="container">
   	
   	<h1>Press Start to play</h1>
-  	<button onclick="main()">Start</button>
 
-  	<p>****Press right and up button to see a fun bug while you are going left.***</p>
-
+    <div class="button_cont"><a class="example_a" onclick="main()">Start</a></div>
+    <div class="button_cont"><a class="example_a" id="restartButton"> restart</a></div>
+    <div class="button_cont"><a class="example_a" onclick="main()">speed up</a></div>
   	<h1 id="score">0</h1>
 
   	<canvas id="mainArea" width="400" height="400">
@@ -29,13 +39,18 @@
     	/*primary vars*/
   
   const snakeboard = document.getElementById("mainArea");
-  
+    
   const snakeboard_context = mainArea.getContext("2d");
-  
+    
+  const scoreSound = document.getElementById("score-sound")
+  const background = document.getElementById("background-sound")
+
   const board_border = 'black';
   const board_background = "white";
-  const snake_col = 'lightblue';
+  let snake_col = 'lightblue';
+  let snakeCol = 'lightblue';
   const snake_border = 'darkblue';
+  const restartButton = $("#restartButton").on("click", restartGame);
   let foodX;
   let foodY; 
   let score = 0;  
@@ -45,11 +60,13 @@
 
   
   /*Snake body */
+
+
   
   let snake = [{
-  	x: 200,
-  	y: 200
-  }, {
+    x: 200,
+    y: 200
+  },{
   	x: 190,
   	y: 200
   }, {
@@ -62,7 +79,7 @@
   	x: 160,
   	y: 200
   }];
-  
+
 
 genFood();
   
@@ -75,7 +92,9 @@ genFood();
   		  setTimeout(function onTick() {
           clearCanvas();
           drawFood();
+          // backgrounSoundPlayer();
           drawSnake();
+          drawSnakeHead();
           moveSnake();
           main();
           },100)
@@ -115,6 +134,15 @@ genFood();
       		dy = 10;
       	}
 
+      }
+
+      // function backgrounSoundPlayer() {
+      //   background.play();
+      // }
+
+
+      function restartGame() {
+        location.reload();
       }
 
 
@@ -167,8 +195,12 @@ genFood();
         snakeboard_context.strokeRect(0, 0, snakeboard.width, snakeboard.height);
       }
   /*Printing function*/
+  
+
+  
+
   function drawSnake() {
-  	snake.forEach(drawSnakePart);
+    snake.forEach(drawSnakePart);
   }
   /*drawing function*/
   
@@ -179,13 +211,37 @@ genFood();
   	snakeboard_context.strokeRect(snakePart.x, snakePart.y, 10, 10);
   }
 
+  function drawSnakeHead() {
+    snakeboard_context.fillStyle = snakeCol;
+    snakeboard_context.fillStroke = snake_border;
+    snakeboard_context.fillRect(snake[0].x, snake[0].y, 10, 10);
+    snakeboard_context.strokeRect(snake[0].x, snake[0].y, 10, 10);
+  }
+
+  
 
   function drawFood() {
-      snakeboard_context.fillStyle = 'lightgreen';
-      snakeboard_context.strokestyle = 'darkgreen';
+      snakeboard_context.fillStyle = window.color;
+      snakeboard_context.strokestyle = window.color;
       snakeboard_context.fillRect(foodX, foodY, 10, 10);
       snakeboard_context.strokeRect(foodX, foodY, 10, 10);
     }
+
+
+    function playScoreSound() {
+      scoreSound.play();
+    }
+
+
+    function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+      window.color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+    
+  }
+  return color;
+}
 
 
   function moveSnake () {
@@ -193,9 +249,12 @@ genFood();
   	snake.unshift(head);
   	const hasEatenFood = snake[0].x == foodX && snake[0].y == foodY;
   	if (hasEatenFood) {
-  		score += 10;
+  		score += 1;
+      snakeCol = window.color;
         document.getElementById('score').innerHTML = score;
         genFood();
+        playScoreSound();
+        getRandomColor();
   	}
   	else {
   	snake.pop();
