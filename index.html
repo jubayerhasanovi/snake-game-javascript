@@ -1,47 +1,50 @@
-  <!DOCTYPE html>
-  <html>
-  <head>
-  	<title>Snake Game</title>
-  	<link rel="stylesheet" type="text/css" href="styles/styles.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-  </head>
-  <body>
-  
+<!DOCTYPE html>
+<html>
 
-    <audio id="score-sound">
-      <source src="score.mp3" type="audio/mp3">
-    </audio>
+<head>
+  <title>Snake Game</title>
+  <link rel="stylesheet" type="text/css" href="styles/styles.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
+</head>
 
-    <!-- <audio id="background-sound" loop>
+<body>
+
+
+  <audio id="score-sound">
+    <source src="score.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- <audio id="background-sound" loop>
       <source src="background.mp3" type="audio/mp3">
     </audio> -->
 
   <div class="container">
-  	
-  	<h1>Press Start to play</h1>
+
+    <h1>Press Start to play</h1>
 
     <div class="button_cont"><a class="example_a" onclick="main()">Start</a></div>
     <div class="button_cont"><a class="example_a" id="restartButton"> restart</a></div>
     <div class="button_cont"><a class="example_a" onclick="main()">speed up</a></div>
-  	<h1 id="score">0</h1>
+    <h1 id="score">0</h1>
 
-  	<canvas id="mainArea" width="400" height="400">
-  		
-  		
-  
-  	</canvas>
-  
+    <canvas id="mainArea" width="400" height="400">
+
+
+
+    </canvas>
+
   </div>
-  
+
 </html>
-    <script>
-    	
-    	/*primary vars*/
-  
+<script>
+
+  /*primary vars*/
+
   const snakeboard = document.getElementById("mainArea");
-    
+
   const snakeboard_context = mainArea.getContext("2d");
-    
+
   const scoreSound = document.getElementById("score-sound")
   const background = document.getElementById("background-sound")
 
@@ -52,221 +55,249 @@
   const snake_border = 'darkblue';
   const restartButton = $("#restartButton").on("click", restartGame);
   let foodX;
-  let foodY; 
-  let score = 0;  
+  let foodY;
+  let score = 0;
   let dx = 10;
   let dy = 0;
-  let changingDirection = false;  
+  let changingDirection = false;
 
-  
+  let headColor = 'blue';
+  let foodColor = 'black';
+
+
   /*Snake body */
 
 
-  
-  let snake = [{
-    x: 200,
-    y: 200
-  },{
-  	x: 190,
-  	y: 200
-  }, {
-  	x: 180,
-  	y: 200
-  }, {
-  	x: 170,
-  	y: 200
-  }, {
-  	x: 160,
-  	y: 200
-  }];
+
+  let snake = [
+    {
+      x: 200,
+      y: 200,
+      color: 'red'
+    },
+    {
+      x: 190,
+      y: 200,
+      color: 'green'
+    },
+    // {
+    //   x: 180,
+    //   y: 200
+    // }, 
+    // {
+    //   x: 170,
+    //   y: 200
+    // }, 
+    // {
+    //   x: 160,
+    //   y: 200
+    // }
+  ];
 
 
-genFood();
-  
-  
-  
+  genFood();
+
+
+
   function main() {
 
-  		  if (hasGameEnded()) return;
-  		  changingDirection = false;
-  		  setTimeout(function onTick() {
-          clearCanvas();
-          drawFood();
-          // backgrounSoundPlayer();
-          drawSnake();
-          drawSnakeHead();
-          moveSnake();
-          main();
-          },100)
-      }
+    if (hasGameEnded()) return;
+    changingDirection = false;
+    setTimeout(function onTick() {
+      clearCanvas();
+      drawFood();
+      // backgrounSoundPlayer();
+      drawSnake();
+      // drawSnakeHead();
+      moveSnake();
+      main();
+    }, 100)
+  }
 
 
 
-      function changeDirection(event) {
-      	const leftKey = 37;
-      	const rightKey = 39;
-      	const upKey = 38;
-      	const downKey = 40;
+  function changeDirection(event) {
+    const leftKey = 37;
+    const rightKey = 39;
+    const upKey = 38;
+    const downKey = 40;
 
-      	const keyPressed = event.keyCode;
-      	const goingUp = dy === -10;
-      	const goingDown = dy === 10;
-      	const goingRight = dx === 10;
-      	const goingLeft = dx === -10;
+    const keyPressed = event.keyCode;
+    const goingUp = dy === -10;
+    const goingDown = dy === 10;
+    const goingRight = dx === 10;
+    const goingLeft = dx === -10;
 
-      	if (keyPressed === leftKey && !goingRight) {
-      		dx = -10;
-      		dy = 0;
-      	}
-      	
-      	if (keyPressed === rightKey && !goingLeft) {
-      		dx = 10;
-      		dy = 0;
-      	}
-      	
-      	if (keyPressed === upKey && !goingDown) {
-      		dx = 0;
-      		dy = -10;
-      	}
-
-      	if (keyPressed === downKey && !goingUp) {
-      		dx = 0;
-      		dy = 10;
-      	}
-
-      }
-
-      // function backgrounSoundPlayer() {
-      //   background.play();
-      // }
-
-
-      function restartGame() {
-        location.reload();
-      }
-
-
-      function hasGameEnded () {
-      	for (var i = 4; i < snake.length; i++) {
-      		const hasCollided = snake[0].x === snake[i].x && snake[0].y === snake[i].y;
-      		if (hasCollided) {
-      			return true;
-      		}
-      }
-      		const hitRightWall = snake[0].x > snakeboard.width -10;
-      		const hitLeftWall = snake[0].x < 0;
-      		const hitUpWall = snake[0].y < 0;
-      		const hitDownWall = snake[0].y > snakeboard.height -10;
-
-      		return hitRightWall || hitLeftWall || hitUpWall || hitDownWall;
-      	}
-
-      	function randomFood (min,max) {
-      		return Math.round((Math.random() * (max-min) +min) /10) *10
-      	}
-
-
-      	// function genFood(){
-      	// 	foodX = randomFood(0,snakeboard.width -10);
-      	// 	foodY = randomFood(0,snakeboard.height -10);
-      	// 	snake.forEach(function hasSnakeEatenFood(Part) {
-      	// 		const hasEaten = part.x === foodX && part.y === foodY
-      	// 	})
-      	// }
-
-      	 function genFood() {
-      // Generate a random number the food x-coordinate
-      foodX = randomFood(0, snakeboard.width - 10);
-      // Generate a random number for the food y-coordinate
-      foodY = randomFood(0, snakeboard.height - 10);
-      // if the new food location is where the snake currently is, generate a new food location
-      snake.forEach(function hasSnakeEatenFood(part) {
-        const hasEaten = part.x == foodX && part.y == foodY;
-        if (hasEaten) genFood();
-      });
+    if (keyPressed === leftKey && !goingRight) {
+      dx = -10;
+      dy = 0;
     }
 
-      
-      
-      function clearCanvas() {
-        snakeboard_context.fillStyle = board_background;
-        snakeboard_context.strokestyle = board_border;
-        snakeboard_context.fillRect(0, 0, snakeboard.width, snakeboard.height);
-        snakeboard_context.strokeRect(0, 0, snakeboard.width, snakeboard.height);
-      }
-  /*Printing function*/
-  
+    if (keyPressed === rightKey && !goingLeft) {
+      dx = 10;
+      dy = 0;
+    }
 
-  
+    if (keyPressed === upKey && !goingDown) {
+      dx = 0;
+      dy = -10;
+    }
+
+    if (keyPressed === downKey && !goingUp) {
+      dx = 0;
+      dy = 10;
+    }
+
+  }
+
+  // function backgrounSoundPlayer() {
+  //   background.play();
+  // }
+
+
+  function restartGame() {
+    location.reload();
+  }
+
+
+  function hasGameEnded() {
+    for (var i = 4; i < snake.length; i++) {
+      const hasCollided = snake[0].x === snake[i].x && snake[0].y === snake[i].y;
+      if (hasCollided) {
+        return true;
+      }
+    }
+    const hitRightWall = snake[0].x > snakeboard.width - 10;
+    const hitLeftWall = snake[0].x < 0;
+    const hitUpWall = snake[0].y < 0;
+    const hitDownWall = snake[0].y > snakeboard.height - 10;
+
+    return hitRightWall || hitLeftWall || hitUpWall || hitDownWall;
+  }
+
+  function randomFood(min, max) {
+    return Math.round((Math.random() * (max - min) + min) / 10) * 10
+  }
+
+
+  // function genFood(){
+  // 	foodX = randomFood(0,snakeboard.width -10);
+  // 	foodY = randomFood(0,snakeboard.height -10);
+  // 	snake.forEach(function hasSnakeEatenFood(Part) {
+  // 		const hasEaten = part.x === foodX && part.y === foodY
+  // 	})
+  // }
+
+  function genFood() {
+    foodColor = getRandomColor();
+    foodX = randomFood(0, snakeboard.width - 10);
+    foodY = randomFood(0, snakeboard.height - 10);
+    snake.forEach(function hasSnakeEatenFood(part) {
+      const hasEaten = part.x == foodX && part.y == foodY;
+      if (hasEaten) genFood();
+    });
+  }
+
+
+
+  function clearCanvas() {
+    snakeboard_context.fillStyle = board_background;
+    snakeboard_context.strokestyle = board_border;
+    snakeboard_context.fillRect(0, 0, snakeboard.width, snakeboard.height);
+    snakeboard_context.strokeRect(0, 0, snakeboard.width, snakeboard.height);
+  }
+  /*Printing function*/
+
+
+
 
   function drawSnake() {
     snake.forEach(drawSnakePart);
   }
   /*drawing function*/
-  
+
   function drawSnakePart(snakePart) {
-  	snakeboard_context.fillStyle = snake_col;
-  	snakeboard_context.fillStroke = snake_border;
-  	snakeboard_context.fillRect(snakePart.x, snakePart.y, 10, 10);
-  	snakeboard_context.strokeRect(snakePart.x, snakePart.y, 10, 10);
-  }
-
-  function drawSnakeHead() {
-    snakeboard_context.fillStyle = snakeCol;
+    snakeboard_context.fillStyle = snakePart.color;
     snakeboard_context.fillStroke = snake_border;
-    snakeboard_context.fillRect(snake[0].x, snake[0].y, 10, 10);
-    snakeboard_context.strokeRect(snake[0].x, snake[0].y, 10, 10);
+    snakeboard_context.fillRect(snakePart.x, snakePart.y, 10, 10);
+    snakeboard_context.strokeRect(snakePart.x, snakePart.y, 10, 10);
   }
 
-  
+  // function drawSnakeHead() {
+  //   snakeboard_context.fillStyle = headColor;
+  //   snakeboard_context.fillStroke = snake_border;
+  //   snakeboard_context.fillRect(snake[0].x, snake[0].y, 10, 10);
+  //   snakeboard_context.strokeRect(snake[0].x, snake[0].y, 10, 10);
+  // }
+
+
 
   function drawFood() {
-      snakeboard_context.fillStyle = window.color;
-      snakeboard_context.strokestyle = window.color;
-      snakeboard_context.fillRect(foodX, foodY, 10, 10);
-      snakeboard_context.strokeRect(foodX, foodY, 10, 10);
+    snakeboard_context.fillStyle = foodColor;
+    snakeboard_context.strokestyle = foodColor;
+    snakeboard_context.fillRect(foodX, foodY, 10, 10);
+    snakeboard_context.strokeRect(foodX, foodY, 10, 10);
+  }
+
+
+  function playScoreSound() {
+    scoreSound.play();
+  }
+
+
+  function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    headColor = color;
+    return color;
+  }
+
+
+  function moveSnake() {
+    const tempSnake = snake;
+
+    console.log(foodColor);
+
+
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy, color: headColor };
+    snake.unshift(head);
+    const hasEatenFood = snake[0].x == foodX && snake[0].y == foodY;
+    if (hasEatenFood) {
+      score += 1;
+      snakeCol = headColor;
+      document.getElementById('score').innerHTML = score;
+      genFood();
+      playScoreSound();
+      getRandomColor();
+
+      // drawSnake()
+
+      console.log(snake);
+    }
+    else {
+      snake.pop();
     }
 
+    // snake[0].color = headColor;
 
-    function playScoreSound() {
-      scoreSound.play();
-    }
+    // for (let i = 1; i < snake.length; i++) {
+    //   snake[i].color = tempSnake[i - 1].color;
+    // }
 
-
-    function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-      window.color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-    
-  }
-  return color;
-}
-
-
-  function moveSnake () {
-  	const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-  	snake.unshift(head);
-  	const hasEatenFood = snake[0].x == foodX && snake[0].y == foodY;
-  	if (hasEatenFood) {
-  		score += 1;
-      snakeCol = window.color;
-        document.getElementById('score').innerHTML = score;
-        genFood();
-        playScoreSound();
-        getRandomColor();
-  	}
-  	else {
-  	snake.pop();
-  }
+    // console.log('SNAKE', snake);
+    // console.log('TEMP SNAKE', tempSnake);
+    // console.log('WINDOW COLOR', headColor);
   }
 
   //event listeners
 
   document.addEventListener("keydown", changeDirection);
-  
-    </script>
-  
-  </body>
 
-  </html>
+</script>
+
+</body>
+
+</html>
