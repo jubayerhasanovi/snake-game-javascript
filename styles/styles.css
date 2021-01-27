@@ -12,6 +12,12 @@ h1 {
 	line-height: 1.4em;
 }
 
+#title {
+	text-align: center;
+	display: inline-block;
+	margin-left: 4.9em;
+}
+
 .example_a {
 color: #fff !important;
 text-transform: uppercase;
